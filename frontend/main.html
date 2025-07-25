@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+
+        .server-msg {
+            color: blue;
+        }
+
+        .client-msg {
+            color: green;
+        }
+
+        .broadcast-msg {
+            color: purple;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>WebSocket Client</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="พิมพ์ข้อความ..." style="width: 300px;">
+    <button id="sendButton">ส่ง</button>
+
+    <script>
+        const WS_URL = 'ws://localhost:8080'; // URL ของ WebSocket Server
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        let ws; // ตัวแปรสำหรับเก็บ WebSocket object
+
+        function connectWebSocket() {
+            ws = new WebSocket(WS_URL);
+
+            // Event: เมื่อเชื่อมต่อสำเร็จ
+            ws.onopen = () => {
+                addMessage('Status: เชื่อมต่อ WebSocket สำเร็จแล้ว!', 'server-msg');
+                console.log('WebSocket connected');
+            };
+
+            // Event: เมื่อได้รับข้อความจาก Server
+            ws.onmessage = event => {
+                const data = JSON.parse(event.data);
+                console.log('ได้รับข้อความจาก Server:', data);
+
+                if (data.type === 'SERVER_MESSAGE') {
+                    addMessage(`Server: ${data.message}`, 'server-msg');
+                } else if (data.type === 'SERVER_UPDATE') {
+                    addMessage(`Server Update: ${data.message}`, 'server-msg');
+                } else if (data.type === 'BROADCAST') {
+                    addMessage(`[${data.timestamp}] ${data.sender}: ${data.content}`, 'broadcast-msg');
+                } else if (data.type === 'NEW_MESSAGE_ADDED') {
+                    const { content, timestamp } = data.payload;
+                    addMessage(`[${new Date(timestamp).toLocaleString()}] (ใหม่): ${content}`, 'broadcast-msg');
+                } else if (data.type === 'INITIAL_MESSAGES') {
+                    data.payload.forEach(msg => {
+                        addMessage(`[${new Date(msg.timestamp).toLocaleString()}] ${msg.content}`, 'broadcast-msg');
+                    });
+                }
+            };
+
+            // Event: เมื่อเกิดข้อผิดพลาด
+            ws.onerror = error => {
+                addMessage('Status: เกิดข้อผิดพลาดกับ WebSocket!', 'server-msg');
+                console.error('WebSocket error:', error);
+            };
+
+            // Event: เมื่อตัดการเชื่อมต่อ
+            ws.onclose = () => {
+                addMessage('Status: ตัดการเชื่อมต่อ WebSocket แล้ว! กำลังลองเชื่อมต่อใหม่...', 'server-msg');
+                console.log('WebSocket disconnected');
+                // ลองเชื่อมต่อใหม่หลังจาก 3 วินาที
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        // ฟังก์ชันสำหรับเพิ่มข้อความลงในหน้าเว็บ
+        function addMessage(message, className = '') {
+            const p = document.createElement('p');
+            p.textContent = message;
+            if (className) {
+                p.classList.add(className);
+            }
+            messagesDiv.appendChild(p);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // เลื่อนไปด้านล่างสุด
+        }
+
+        // Event: เมื่อกดปุ่มส่ง
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'NEW_MESSAGE', content: message }));// ส่งข้อความไปยัง Server
+                addMessage(`คุณ: ${message}`, 'client-msg');
+                messageInput.value = ''; // ล้างช่อง input
+            } else if (ws.readyState !== WebSocket.OPEN) {
+                addMessage('Status: WebSocket ยังไม่พร้อมส่งข้อความ (อาจจะยังไม่เชื่อมต่อ)', 'server-msg');
+            }
+        });
+
+        // Event: เมื่อกด Enter ในช่อง input
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+        window.addEventListener('error', (e) => {
+            addMessage('เกิดข้อผิดพลาดจาก client-side JS: ' + e.message, 'server-msg');
+        });
+
+
+        // เริ่มต้นการเชื่อมต่อเมื่อโหลดหน้าเว็บ
+        connectWebSocket();
+    </script>
+</body>
+
+</html>
