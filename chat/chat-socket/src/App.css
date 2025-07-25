@@ -1,3 +1,142 @@
 body {
   margin: 0;
+  font-family: "Ubuntu", sans-serif;
+}
+
+.phone-container {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  width: 340px;
+  margin: 50px auto;
+  border-radius: 40px;
+  border: 6px solid #ffffff;
+  overflow: hidden;
+  /* padding: 15px; */
+  color: white;
+  background: radial-gradient(circle, #7568e6 0%, #574cd6 100%);
+}
+
+.header-phone {
+  position: relative;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  background-color: #574cd6;
+  padding: 10px 15px;
+}
+
+.header-phone img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  margin-right: 10px;
+}
+
+.button-clear {
+  position: absolute;
+  right: 10px;
+  top: 20px;
+  border: none;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+  font-family: "Ubuntu", sans-serif;
+  transition: all 0.3s ease-in-out;
+}
+
+.button-clear:hover {
+  font-size: 1.2rem;
+  font-weight: 900;
+  background-color: red;
+  border-radius: 20px;
+}
+
+/* Container หลักของข้อความแชท */
+.chat-container {
+  padding: 15px;
+  height: 450px;
+  overflow-y: scroll;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-container::-webkit-scrollbar {
+  /* display: none; */
+  width: 4px;
+  background-color: #d3d3d3;
+  border-radius: 10px;
+
+}
+
+
+.chat {
+  margin: 10px 0;
+  padding: 15px 20px;
+  width: fit-content;
+  max-width: 75%;
+  word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+
+.chat.sender {
+  background-color: #ffffff;
+  color: #7A6EED;
+  border-radius: 15px 15px 0px 15px;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+
+.chat.receiver {
+  background-color: #7A6EED;
+  color: #ffffff;
+  border-radius: 0px 15px 15px 15px;
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+.input-chat {
+  display: flex;
+  margin: 0 20px;
+}
+
+.input-phone {
+  width: 75%;
+  padding: 10px 10px;
+  border-radius: 50px;
+  border: 3px solid #ffffff;
+  outline: none;
+  font-size: 1rem;
+  font-family: "Ubuntu", sans-serif;
+  transition: 0.3s ease-in-out;
+}
+
+.input-phone:focus {
+  border: 3px solid #11096b;
+}
+
+.button-send {
+  background-color: #ffffff;
+  color: #574cd6;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  padding: 0 10px;
+  border-radius: 30px;
+  margin-left: 10px;
+  font-weight: 800;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+.button-send:hover {
+  background-color: #11096b;
+  color: #ffffff;
+  padding: 0 15px;
 }
